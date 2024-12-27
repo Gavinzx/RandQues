@@ -15,6 +15,10 @@ class RandomQuizApp:
         self.root = root
         self.root.title("随机抽题程序")
 
+        # 设置窗口大小和最小大小
+        self.root.geometry("700x500")  # 初始窗口大小
+        self.root.minsize(700, 500)  # 最小窗口大小
+
         # 文件和数据存储
         self.df = None
 
@@ -38,8 +42,8 @@ class RandomQuizApp:
         self.start_button.pack(pady=20)
 
         # 输出区域（显示抽取的题目）
-        self.result_text = tk.Text(self.root, height=10, width=50)
-        self.result_text.pack(pady=10)
+        self.result_text = tk.Text(self.root, height=12, width=60)  # 调整文本框大小
+        self.result_text.pack(padx=10, pady=10, fill='both', expand=True)  # 使文本框随窗口大小调整
 
         # 提供保存按钮
         self.save_button = tk.Button(self.root, text="保存题目", command=self.save_quiz)
