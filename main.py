@@ -3,9 +3,14 @@ from tkinter import filedialog
 import pandas as pd
 import random
 
+AUTHOR = "Gavin"
+VERSION = "@VERSION@"
+DATE = "@DATE@"
+
 
 class RandomQuizApp:
     def __init__(self, root):
+        self.signature_label = None
         self.message_label = None
         self.save_button = None
         self.result_text = None
@@ -53,6 +58,10 @@ class RandomQuizApp:
         # 消息显示区域（用于显示错误和成功信息）
         self.message_label = tk.Label(self.root, text="", fg="red", wraplength=650)
         self.message_label.pack(pady=5)
+
+        # 签名行（显示程序开发者和版本信息）
+        self.signature_label = tk.Label(self.root, text=f"{AUTHOR} | {VERSION} | {DATE}", fg="gray", font=("Arial", 8))
+        self.signature_label.pack(side="bottom", pady=10)
 
     def upload_file(self):
         """上传Excel文件并读取数据"""
