@@ -1,11 +1,12 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 import pandas as pd
 import random
 
 
 class RandomQuizApp:
     def __init__(self, root):
+        self.message_label = None
         self.save_button = None
         self.result_text = None
         self.start_button = None
@@ -49,6 +50,10 @@ class RandomQuizApp:
         self.save_button = tk.Button(self.root, text="保存题目", command=self.save_quiz)
         self.save_button.pack(pady=10)
 
+        # 消息显示区域（用于显示错误和成功信息）
+        self.message_label = tk.Label(self.root, text="", fg="red", wraplength=650)
+        self.message_label.pack(pady=5)
+
     def upload_file(self):
         """上传Excel文件并读取数据"""
         file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")])
@@ -58,16 +63,16 @@ class RandomQuizApp:
                 self.df = pd.read_excel(file_path)
                 # 确保文件中有题目列
                 if '知识点' not in self.df.columns:
-                    messagebox.showerror("错误", "Excel文件中没有'知识点'列！")
+                    self.show_message("错误: Excel文件中没有'知识点'列！", "red")
                     return
-                messagebox.showinfo("成功", "文件上传成功！")
+                self.show_message("文件上传成功！", "green")
             except Exception as e:
-                messagebox.showerror("错误", f"文件读取失败: {e}")
+                self.show_message(f"错误: {e}", "red")
 
     def start_draw(self):
         """开始抽题"""
         if self.df is None:
-            messagebox.showerror("错误", "请先上传一个Excel文件！")
+            self.show_message("错误: 请先上传一个Excel文件！", "red")
             return
 
         # 获取用户输入的抽取数量
@@ -76,13 +81,13 @@ class RandomQuizApp:
             if num_questions <= 0:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("错误", "请输入一个有效的抽题数量！")
+            self.show_message("错误: 请输入一个有效的抽题数量！", "red")
             return
 
         # 随机抽取题目
         questions = self.df['知识点'].dropna().tolist()  # 确保去掉空值
         if num_questions > len(questions):
-            messagebox.showerror("错误", "抽题数量不能大于题目总数！")
+            self.show_message("错误: 抽题数量不能大于题目总数！", "red")
             return
 
         selected_questions = random.sample(questions, num_questions)
@@ -90,13 +95,15 @@ class RandomQuizApp:
         # 显示结果
         self.result_text.delete(1.0, tk.END)  # 清空现有的内容
         for idx, question in enumerate(selected_questions, start=1):
-            self.result_text.insert(tk.END, f"题目 {idx}: {question}\n")
+            self.result_text.insert(tk.END, f"{idx}: {question}\n")
+
+        self.show_message("抽题成功！", "green")
 
     def save_quiz(self):
         """保存抽取的题目到指定路径"""
         quiz_content = self.result_text.get(1.0, tk.END).strip()
         if not quiz_content:
-            messagebox.showerror("错误", "没有题目可以保存！")
+            self.show_message("错误: 没有题目可以保存！", "red")
             return
 
         # 打开文件保存对话框，选择保存路径和文件名
@@ -105,9 +112,13 @@ class RandomQuizApp:
             try:
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(quiz_content)
-                messagebox.showinfo("成功", f"题目已保存到: {file_path}")
+                self.show_message(f"题目已保存到: {file_path}", "green")
             except Exception as e:
-                messagebox.showerror("错误", f"保存文件失败: {e}")
+                self.show_message(f"错误: 保存文件失败: {e}", "red")
+
+    def show_message(self, message, color):
+        """更新消息显示区域"""
+        self.message_label.config(text=message, fg=color)
 
 
 # 创建主窗口
