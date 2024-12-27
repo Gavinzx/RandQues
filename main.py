@@ -6,8 +6,8 @@ import random
 
 class RandomQuizApp:
     def __init__(self, root):
+        self.save_button = None
         self.result_text = None
-        self.print_button = None
         self.start_button = None
         self.num_entry = None
         self.num_label = None
@@ -41,9 +41,9 @@ class RandomQuizApp:
         self.result_text = tk.Text(self.root, height=10, width=50)
         self.result_text.pack(pady=10)
 
-        # 提供打印按钮
-        self.print_button = tk.Button(self.root, text="打印题目", command=self.print_quiz)
-        self.print_button.pack(pady=10)
+        # 提供保存按钮
+        self.save_button = tk.Button(self.root, text="保存题目", command=self.save_quiz)
+        self.save_button.pack(pady=10)
 
     def upload_file(self):
         """上传Excel文件并读取数据"""
@@ -88,20 +88,22 @@ class RandomQuizApp:
         for idx, question in enumerate(selected_questions, start=1):
             self.result_text.insert(tk.END, f"题目 {idx}: {question}\n")
 
-    def print_quiz(self):
-        """打印抽取的题目"""
+    def save_quiz(self):
+        """保存抽取的题目到指定路径"""
         quiz_content = self.result_text.get(1.0, tk.END).strip()
         if not quiz_content:
-            messagebox.showerror("错误", "没有题目可以打印！")
+            messagebox.showerror("错误", "没有题目可以保存！")
             return
 
-        # 打印功能（简单地将内容复制到剪贴板或打印）
-        try:
-            with open("抽题结果.txt", "w") as f:
-                f.write(quiz_content)
-            messagebox.showinfo("成功", "题目已保存为'抽题结果.txt'，可以打印。")
-        except Exception as e:
-            messagebox.showerror("错误", f"保存文件失败: {e}")
+        # 打开文件保存对话框，选择保存路径和文件名
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")])
+        if file_path:
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(quiz_content)
+                messagebox.showinfo("成功", f"题目已保存到: {file_path}")
+            except Exception as e:
+                messagebox.showerror("错误", f"保存文件失败: {e}")
 
 
 # 创建主窗口
